@@ -1,0 +1,133 @@
+---
+description: The application functional requirements
+globs: 
+---
+# Requisiti Funzionali - Sistema di Analisi Email e Generazione RFQ
+
+## 1. Obiettivo del Sistema
+Sviluppare un'applicazione che analizzi automaticamente le email di richiesta di quotazione e generi un output strutturato in formato JSON compatibile con il sistema RFQ interno.
+
+## 2. Funzionalità Core
+
+### 2.1 Analisi Email
+- Capacità di processare email in formato testo
+- Estrazione automatica dei seguenti campi:
+  - Oggetto della richiesta
+  - Email del richiedente
+  - Nome del cliente
+  - Quantità richieste
+  - Codice prodotto
+  - Date (richiesta e scadenza)
+  - Note e specifiche tecniche
+  - Servizi richiesti
+
+### 2.2 Elaborazione Dati
+
+#### 2.2.1 Gestione Cliente
+- Identificazione del cliente dal dominio email o dal testo
+- Esclusione automatica di "EES" come cliente e ricerca del cliente effettivo
+- Normalizzazione del nome cliente
+
+#### 2.2.2 Gestione Date
+- Estrazione della data di richiesta dall'email
+- Calcolo automatico della data di scadenza (data richiesta + 15 giorni lavorativi) se non specificata
+- Conversione di tutte le date nel formato dd/mm/yyyy
+
+#### 2.2.3 Gestione Quantità
+- Supporto per richieste multi-quantità
+- Generazione di oggetti JSON separati per ogni quantità richiesta
+- Validazione dei valori numerici
+
+#### 2.2.4 Gestione Servizi
+- Identificazione e categorizzazione dei servizi richiesti
+- Aggiunta automatica di "Acquisto PCB" e "Acquisto Kit" se non esplicitamente esclusi
+- Ereditarietà della quantità principale per i servizi senza quantità specificata
+
+### 2.3 Generazione Output
+
+#### 2.3.1 Struttura JSON
+- Generazione di output JSON con schema fisso
+- Inclusione di tutti i campi obbligatori anche se vuoti
+- Validazione della struttura prima dell'output
+
+#### 2.3.2 Note e Richieste
+- Generazione automatica di note sintetiche ma complete
+- Identificazione di informazioni mancanti
+- Creazione di richieste formali per il cliente quando necessario
+
+## 3. Regole di Business
+
+### 3.1 Validazioni Obbligatorie
+- Verifica presenza campi obbligatori
+- Controllo formato date
+- Validazione numeri e quantità
+- Verifica coerenza tra servizi e specifiche
+
+### 3.2 Regole Automatiche
+- Aggiunta automatica di servizi standard (Acquisto PCB e Kit)
+- Calcolo date di scadenza
+- Gestione allegati e riferimenti a file
+- Identificazione richieste incomplete
+
+## 4. Gestione Casi Speciali
+
+### 4.1 Email Inoltrate
+- Identificazione del richiedente effettivo
+- Estrazione oggetto dal corpo del testo
+- Gestione di multiple forward
+
+### 4.2 Informazioni Incomplete
+- Generazione campo richieste_per_cliente
+- Identificazione informazioni critiche mancanti
+- Formattazione domande per il cliente
+
+### 4.3 Gestione Allegati
+- Rilevamento riferimenti a file allegati
+- Aggiunta nota standard per presenza allegati
+- Tracking tipologia allegati menzionati
+
+## 5. Requisiti di Output
+
+### 5.1 Formato JSON
+- Schema fisso e consistente
+- Campi sempre presenti (anche se vuoti)
+- Formattazione standardizzata
+- Encoding UTF-8
+
+### 5.2 Campi Obbligatori
+- oggetto
+- richiedente
+- cliente
+- quantità
+- codice_prodotto
+- data_richiesta
+- data_scadenza
+- note
+- servizi (array di oggetti)
+
+### 5.3 Struttura Servizi
+- nome (stringa)
+- quantità (numero)
+- note (stringa, opzionale)
+
+## 6. Requisiti di Qualità
+- Accuratezza nell'estrazione dei dati > 95%
+- Tempo di elaborazione < 5 secondi per email
+- Gestione corretta di caratteri speciali
+- Resilienza a variazioni nel formato delle email
+- Logging completo delle operazioni
+- Gestione degli errori con messaggi chiari
+
+## 7. Requisiti di Integrazione
+- Compatibilità con il sistema RFQ interno
+- API RESTful per l'integrazione
+- Supporto per batch processing
+- Gestione delle sessioni e autenticazione
+- Monitoring e alerting
+
+## 8. Vincoli Tecnici
+- Conformità GDPR per il trattamento dei dati
+- Sicurezza nell'accesso ai dati
+- Backup e persistenza dei dati elaborati
+- Scalabilità orizzontale
+- Documentazione API completa
