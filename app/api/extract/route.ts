@@ -36,18 +36,23 @@ Output the data in this exact JSON structure:
   ${context}
 }`
 
-export async function POST(req: Request) {
-  const context = await req.json()
+interface RequestBody {
+  content: string
+  settings: {
+    model: string
+    temperature: number
+  }
+}
 
-  console.log(context)
+export async function POST(req: Request) {
+  const { content, settings } = await req.json() as RequestBody
 
   const result = streamObject({
-    model: openai('gpt-4o'),
+    model: openai(settings.model),
     schema: responseSchema,
-    prompt: getPrompt(context),
+    prompt: getPrompt(content),
+    temperature: settings.temperature
   })
-
-  console.log(result)
 
   return result.toTextStreamResponse()
 } 
